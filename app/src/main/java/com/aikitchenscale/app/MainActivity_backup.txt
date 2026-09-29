@@ -1,0 +1,130 @@
+﻿package com.aikitchenscale.app
+
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+data class FoodEstimate(
+    val foodName: String,
+    val grams: Int,
+    val minGrams: Int,
+    val maxGrams: Int,
+    val calories: Int,
+    val protein: Double,
+    val fat: Double,
+    val carbs: Double,
+)
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { KitchenScaleApp() }
+    }
+}
+
+@Composable
+private fun KitchenScaleApp() {
+    var selectedImage by remember { mutableStateOf<Uri?>(null) }
+    var estimate by remember { mutableStateOf<FoodEstimate?>(null) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        selectedImage = uri
+        estimate = uri?.let {
+            // Temporary local demo until the secured AI analysis endpoint is connected.
+            FoodEstimate("Grilled chicken with rice", 340, 285, 395, 515, 42.0, 12.0, 58.0)
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = Color(0xFF287A55),
+            background = Color(0xFFF7FBF8),
+            surface = Color.White,
+        )
+    ) {
+        Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(18.dp),
+            ) {
+                Text("AI Kitchen Scale", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    "Photograph your meal and get a clear weight range and nutrition estimate.",
+                    color = Color(0xFF52615A),
+                )
+
+                Button(
+                    onClick = { picker.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text(if (selectedImage == null) "Choose food photo" else "Choose another photo")
+                }
+
+                if (estimate == null) {
+                    EmptyState()
+                } else {
+                    ResultCard(estimate!!)
+                    Text(
+                        "Estimate only. Portion visibility, plate size and camera angle affect accuracy.",
+                        color = Color(0xFF6A746F),
+                        fontSize = 13.sp,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyState() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(230.dp)
+            .background(Color.White, RoundedCornerShape(24.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text("Your food analysis will appear here", color = Color(0xFF66736C))
+    }
+}
+
+@Composable
+private fun ResultCard(result: FoodEstimate) {
+    Card(shape = RoundedCornerShape(24.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Text(result.foodName, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Text("${result.grams} g", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text("Likely range: ${result.minGrams}–${result.maxGrams} g", color = Color(0xFF52615A))
+            HorizontalDivider()
+            NutritionRow("Calories", "${result.calories} kcal")
+            NutritionRow("Protein", "${result.protein} g")
+            NutritionRow("Fat", "${result.fat} g")
+            NutritionRow("Carbohydrates", "${result.carbs} g")
+        }
+    }
+}
+
+@Composable
+private fun NutritionRow(label: String, value: String) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = Color(0xFF52615A))
+        Text(value, fontWeight = FontWeight.SemiBold)
+    }
+}
