@@ -9,7 +9,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
-app.options("*",cors());
+app.use((req, res,next) => {res.header("Access-Control-Allow-Origin", "*"); 
+res.header(Access-Control-Allow-Headers", "Content-Type"); next(); });
 app.use(express.json({ limit: "15mb" }));
 
 app.get("/", (req, res) => {
