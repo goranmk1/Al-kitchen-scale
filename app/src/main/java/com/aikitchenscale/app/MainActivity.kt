@@ -230,8 +230,8 @@ Base64.NO_WRAP
 
  val requestJson = JSONObject()
 .put("imageBase64", base64)
-.put("mimeType", mimeType",) image/jpeg")
-
+.put("mimeType", mimeType)
+put("language","mk")
 
  val connection =
 URL(ANALYZE_URL)
