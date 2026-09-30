@@ -12,7 +12,9 @@ app.use(cors({ origin: "*" }));
 
 
 app.use(express.json({ limit: "15mb" }));
-
+app.get("/test", (req,res) =>
+  res.send("TEST PAGE WORKS");
+});
 app.get("/", (req, res) => {
   res.json({
     ok: true,
