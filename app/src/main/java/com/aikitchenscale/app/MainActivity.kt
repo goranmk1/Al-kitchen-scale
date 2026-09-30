@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private  val ANALYZE_URL =
-            "https://ai-kitchen-scale-production.up.railway.app/analyze"
+            "https://al-kitchen-scale-production.up.railway.app/analyze"
         override fun onCreate(savedInstanceState: Bundle?) {
      super.onCreate(savedInstanceState)
 
