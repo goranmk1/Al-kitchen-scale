@@ -26,10 +26,11 @@ android {
     }
 
     buildFeatures {
-}
+
+
         compose = true
     }
-
+}
 
 
 
